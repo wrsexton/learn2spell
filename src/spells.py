@@ -31,7 +31,7 @@ class Spells():
             raise Exception(f"({r.status_code}) An error occurred when accessing {url}")
 
         return r.json()
-
+    
     @staticmethod
     def getSpellURL(index):
         return f"{SPELLS_INDEX_URL}/{index}"
