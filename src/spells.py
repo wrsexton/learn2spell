@@ -23,7 +23,7 @@ class Spells():
         if(r.status_code != 200):
             raise Exception(f"({r.status_code}) An error occurred when accessing {SPELLS_INDEX_URL}")
         
-        indexes = [s["index"] for s in r.json()["results"]]
+        indexes = self.spellsToSpellKeys(r.json()["results"], "index")
         return indexes
 
     @BO.on_exception(BO.expo,
@@ -48,8 +48,15 @@ class Spells():
         for index in indexes:
             spells.append(self.getSpell(index))
         return spells
+
+    @staticmethod
+    def spellsToSpellKeys(spell_list_json: T.Iterable[dict],
+                          key: str) -> T.Union[T.Iterable[str],
+                                               T.Iterable[dict]]:
+        """TODO Document"""
+        return [s[key] for s in spell_list_json]
     
     @staticmethod
-    def getSpellURL(index):
+    def getSpellURL(index: str) -> str:
         """TODO Document"""
         return f"{SPELLS_INDEX_URL}/{index}"

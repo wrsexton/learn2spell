@@ -1,13 +1,16 @@
 import typing as T
 import pytest as PT
 import requests_mock as RM
+
 import spells as S
+import learning as L
 
 from . import fixture as F
 
 class TestLearn2Spell():
 
     def test_sanity(self):
+        L.main()
         assert True
 
     @PT.mark.parametrize(

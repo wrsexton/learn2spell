@@ -4,4 +4,3 @@ import numpy as N
 
 from . import spells as S
 
-S.getAllSpellIndexes()
