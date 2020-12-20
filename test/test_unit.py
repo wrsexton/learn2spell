@@ -1,6 +1,9 @@
 import typing as T
 import pytest as PT
-import json as J
+import requests_mock as RM
+import spells as S
+
+from . import fixture as F
 
 class TestLearn2Spell():
 
@@ -8,7 +11,11 @@ class TestLearn2Spell():
         assert True
 
     def test_spells(self,
-                    spells):
-        j = spells.getAllSpellIndexes()
-        print(J.dumps(j, indent=2, sort_keys=True))
-        assert False
+                    requests_mock: RM.Mocker,
+                    spells: S.Spells):
+        requests_mock.register_uri(RM.GET,
+                                   S.SPELLS_INDEX_URL,
+                                   status_code=200,
+                                   json=F.FAKE_SPELLS_INDEX)
+        result = spells.getAllSpellIndexes()
+        assert result == [s["index"] for s in F.FAKE_SPELLS_INDEX["results"]]

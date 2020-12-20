@@ -1,9 +1,9 @@
 import typing as T
 import requests as R
-import json
 import os
 
-API="https://www.dnd5eapi.co/api"
+API_URL="https://www.dnd5eapi.co/api"
+SPELLS_INDEX_URL=f"{API_URL}/spells"
 
 class Spells():
     """An interface to the dnd5e API"""
@@ -13,6 +13,6 @@ class Spells():
 
     def getAllSpellIndexes(self):
         """TODO Document"""
-        r = self._s.get(f"{API}/spells")
-        j = r.json()
-        return j
+        r = self._s.get(SPELLS_INDEX_URL)
+        indexes = [s["index"] for s in r.json()["results"]]
+        return indexes
