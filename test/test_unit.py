@@ -28,7 +28,7 @@ class TestLearn2Spell():
                                    json=F.FAKE_SPELLS_INDEX)
         if(success):
             result = spells.getAllSpellIndexes()
-            assert result == [s["index"] for s in F.FAKE_SPELLS_INDEX["results"]]
+            assert result == F.FAKE_SPELLS_INDEX_NAMES
         else:
             with PT.raises(Exception):
                 result = spells.getAllSpellIndexes()
@@ -56,3 +56,22 @@ class TestLearn2Spell():
         else:
             with PT.raises(Exception):
                 result = spells.getAllSpellIndexes()
+
+    def test_getAllSpells(self,
+                          requests_mock: RM.Mocker,
+                          spells: S.Spells):
+        code = 200
+        indexes = F.FAKE_SPELLS_INDEX_NAMES
+        allSpells = []
+        for index in indexes:
+            requests_mock.register_uri(RM.GET,
+                                       spells.getSpellURL(index),
+                                       status_code=code,
+                                       json=F.FAKE_SPELL)
+            allSpells.append(F.FAKE_SPELL)
+        requests_mock.register_uri(RM.GET,
+                                   S.SPELLS_INDEX_URL,
+                                   status_code=code,
+                                   json=F.FAKE_SPELLS_INDEX)
+        result = spells.getAllSpells()
+        assert result == allSpells

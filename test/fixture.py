@@ -21,6 +21,8 @@ FAKE_SPELLS_INDEX = {
     ]
 }
 
+FAKE_SPELLS_INDEX_NAMES = [s["index"] for s in FAKE_SPELLS_INDEX["results"]]
+
 FAKE_SPELL = {
     "index": "fake-spell-1",
     "name": "Fake Spell 1",

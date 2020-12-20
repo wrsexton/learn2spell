@@ -42,7 +42,12 @@ class Spells():
         return r.json()
 
     def getAllSpells(self) -> T.Iterable[dict]:
-        indexes = self.getAllSpellIndexes
+        """TODO Document"""
+        spells = []
+        indexes = self.getAllSpellIndexes()
+        for index in indexes:
+            spells.append(self.getSpell(index))
+        return spells
     
     @staticmethod
     def getSpellURL(index):
