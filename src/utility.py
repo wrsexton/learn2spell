@@ -38,11 +38,7 @@ def preprocessAndSaveData(data: str,
                           lookup_creation_func: T.Any,
                           filepath: str,
                           tokens: T.Optional[dict]=TOKENS):
-    for key, token in TOKENS.items():
-        data = data.replace(key, f" {token} ")
-    data = data.lower().split()
-    vocab_to_int = lookup_creation_func(data)
-    int_to_vocab = {v:k for k, v in vocab_to_int.items()}
+    vocab_to_int, int_to_vocab = lookup_creation_func(data)
     int_data = [vocab_to_int[word] for word in data]
     with open(filepath, "wb") as f:
         P.dump((int_data, vocab_to_int, int_to_vocab, TOKENS), f)
