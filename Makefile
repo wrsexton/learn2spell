@@ -13,6 +13,8 @@ all::
 
 clean:
 	exec git clean -dfxe .env -e \*.egg-info
+run: .setup
+	exec $(call run-dev,$(OPTIONS),$(ARGS))
 
 check: .setup
 	exec $(call run-dev,$(OPTIONS),pytest $(ARGS))
