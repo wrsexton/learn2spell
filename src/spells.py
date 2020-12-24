@@ -38,7 +38,6 @@ class Spells():
 
         if(r.status_code != 200):
             raise Exception(f"({r.status_code}) An error occurred when accessing {url}")
-
         return r.json()
 
     def getAllSpells(self) -> T.Iterable[dict]:
@@ -48,6 +47,20 @@ class Spells():
         for index in indexes:
             spells.append(self.getSpell(index))
         return spells
+
+    def loadJSONData(self,
+                     filepath: str) -> T.Iterable[dict]:
+        """TODO Document"""
+        # Create data file if it does not yet exist
+        if not path.exists(filepath):
+            spells_data = {"spells":self.getAllSpells()}
+            with open(filepath, "w") as f:
+                J.dump(spells_data, f)
+                return spells_data["spells"]
+        # Load data file if it does currently exist
+        with open(filepath, "r") as f:
+            spells_data = J.load(f)
+        return spells_data["spells"]
 
     @staticmethod
     def spellsToSpellKeys(spell_list_json: T.Iterable[dict],

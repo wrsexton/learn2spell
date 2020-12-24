@@ -1,13 +1,29 @@
+# Third party
 import typing as T
 import tensorflow as TF
 import numpy as NP
 import json as J
+import pickle as P
 import warnings as W
 
 from os import path
 
-import utility as U
+# local project
 import spells as S
+
+def preprocessAndSaveData(data: str,
+                          lookup_creation_func: T.Any, # TODO, there's probably a better way to type this...
+                          filepath: str):
+    """TODO Document"""
+    vocab_to_int, int_to_vocab = lookup_creation_func(data)
+    int_data = [vocab_to_int[word] for word in data]
+    with open(filepath, "wb") as f:
+        P.dump((int_data, vocab_to_int, int_to_vocab), f)
+
+def loadPickle(filepath: str):
+    """TODO Document"""
+    with open(filepath, "rb") as f:
+        return P.load(f)
 
 def createLookupTables(data: str) -> T.Iterable[dict]:
     """TODO Document"""
@@ -20,7 +36,7 @@ def createLookupTables(data: str) -> T.Iterable[dict]:
 def buildModel(vocab_size: int,
                embedding_dim: int,
                rnn_units: int,
-               batch_size: int) -> TF.Model:
+               batch_size: int) -> TF.keras.Model:
     """TODO Document"""
     model = TF.keras.Sequential([
         TF.keras.layers.Embedding(vocab_size, embedding_dim,
@@ -33,7 +49,7 @@ def buildModel(vocab_size: int,
     ])
     return model
 
-def generate_text(model: TF.Model,
+def generate_text(model: TF.keras.Model,
                   start_string: str,
                   char2idx: dict,
                   idx2char: dict) -> str:
@@ -77,11 +93,11 @@ def main():
     # PREPROCESSING
     preprocessed_path = "preprocessed.p"
     if not path.exists(preprocessed_path):
-        spell_list_json = U.loadJSONData("spell_data.json")
+        spell_list_json = S.loadJSONData("spell_data.json")
         descs = S.Spells.spellsToSpellKeys(spell_list_json, "desc")
         data_descs = "\n\n".join(["\n".join(d) for d in descs])
-        U.preprocessAndSaveData(data_descs, createLookupTables, preprocessed_path)
-    int_data, vocab_to_int, int_to_vocab, tokens = U.loadPickle(preprocessed_path)
+        preprocessAndSaveData(data_descs, createLookupTables, preprocessed_path)
+    int_data, vocab_to_int, int_to_vocab, tokens = loadPickle(preprocessed_path)
 
     # BUILDING THE NEURAL NETWORK
     # Check for a GPU
