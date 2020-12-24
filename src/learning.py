@@ -17,10 +17,11 @@ def createLookupTables(data: str) -> T.Iterable[dict]:
     int_to_vocab = NP.array(vocab)
     return vocab_to_int, int_to_vocab
 
-def buildModel(vocab_size,
-               embedding_dim,
-               rnn_units,
-               batch_size):
+def buildModel(vocab_size: int,
+               embedding_dim: int,
+               rnn_units: int,
+               batch_size: int) -> TF.Model:
+    """TODO Document"""
     model = TF.keras.Sequential([
         TF.keras.layers.Embedding(vocab_size, embedding_dim,
                                   batch_input_shape=[batch_size, None]),
@@ -32,9 +33,12 @@ def buildModel(vocab_size,
     ])
     return model
 
-def generate_text(model, start_string, char2idx, idx2char):
+def generate_text(model: TF.Model,
+                  start_string: str,
+                  char2idx: dict,
+                  idx2char: dict) -> str:
+    """TODO Document"""
     # Evaluation step (generating text using the learned model)
-    
     # Number of characters to generate
     num_generate = 1000
     
