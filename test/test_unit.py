@@ -9,10 +9,6 @@ from . import fixture as F
 
 class TestLearn2Spell():
 
-    def test_sanity(self):
-        L.main()
-        assert True
-
     @PT.mark.parametrize(
         ('success', 'code' ),
         (

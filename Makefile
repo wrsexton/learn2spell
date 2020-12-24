@@ -17,7 +17,7 @@ clean:
 check: .setup
 	exec $(call run-dev,$(OPTIONS),pytest $(ARGS))
 
-.setup: conf/requirements setup.cfg
+.setup: setup.cfg
 	if [ -f .setup ]; then rm .setup; fi
 	exec bash -c "\
 	set -e;\
