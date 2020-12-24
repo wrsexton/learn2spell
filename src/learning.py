@@ -1,4 +1,8 @@
-# Third party
+# Third party module imports
+import dotenv as DE
+DE.load_dotenv()
+DE.load_dotenv(DE.find_dotenv('.env.defaults'))
+
 import typing as T
 import tensorflow as TF
 import numpy as NP
@@ -6,10 +10,17 @@ import json as J
 import pickle as P
 import warnings as W
 
-from os import path
+import os
 
-# local project
+# local module imports
 import spells as S
+
+# ENV VARS
+EPOCHS = int(os.getenv("L2S_EPOCHS", "10"))
+START_STR_DESCRIPTION = os.getenv("L2S_START_STR_DESCRIPTION", "A ")
+
+print(f"EPOCHS set to: {EPOCHS}")
+print(f"START_STR_DESCRIPTION set to: {START_STR_DESCRIPTION}")
 
 def preprocessAndSaveData(data: str,
                           lookup_creation_func: T.Any, # TODO, there's probably a better way to type this...
@@ -92,12 +103,12 @@ def generate_text(model: TF.keras.Model,
 def main():
     # PREPROCESSING
     preprocessed_path = "preprocessed.p"
-    if not path.exists(preprocessed_path):
-        spell_list_json = S.loadJSONData("spell_data.json")
+    if not os.path.exists(preprocessed_path):
+        spell_list_json = S.Spells().loadJSONData("spell_data.json")
         descs = S.Spells.spellsToSpellKeys(spell_list_json, "desc")
         data_descs = "\n\n".join(["\n".join(d) for d in descs])
         preprocessAndSaveData(data_descs, createLookupTables, preprocessed_path)
-    int_data, vocab_to_int, int_to_vocab, tokens = loadPickle(preprocessed_path)
+    int_data, vocab_to_int, int_to_vocab = loadPickle(preprocessed_path)
 
     # BUILDING THE NEURAL NETWORK
     # Check for a GPU
@@ -174,15 +185,13 @@ def main():
 
     # Directory where the checkpoints will be saved
     checkpoint_dir = './training_checkpoints'
-    if not path.exists(checkpoint_dir):
+    if not os.path.exists(checkpoint_dir):
         # Name of the checkpoint files
-        checkpoint_prefix = path.join(checkpoint_dir, "ckpt_{epoch}")
+        checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt_{epoch}")
         
         checkpoint_callback = TF.keras.callbacks.ModelCheckpoint(
             filepath=checkpoint_prefix,
             save_weights_only=True)
-
-        EPOCHS = 30
         
         history = model.fit(dataset, epochs=EPOCHS, callbacks=[checkpoint_callback])
         print(history)
@@ -196,5 +205,12 @@ def main():
     print(model.summary())
 
     print("--- GENERATED SPELL DESCRIPTION BEGIN ---")
-    print(generate_text(model, start_string=u"A ", char2idx=vocab_to_int, idx2char=int_to_vocab))
+    print(generate_text(model,
+                        start_string=START_STR_DESCRIPTION,
+                        char2idx=vocab_to_int,
+                        idx2char=int_to_vocab))
     print("--- GENERATED SPELL DESCRIPTION END ---")
+
+
+print(f"--- Begin main() ---")
+main()

@@ -14,7 +14,7 @@ all::
 clean:
 	exec git clean -dfxe .env -e \*.egg-info
 run: .setup
-	exec $(call run-dev,$(OPTIONS),$(ARGS))
+	exec $(call run-dev,$(OPTIONS),python ./src/learning.py $(ARGS))
 
 check: .setup
 	exec $(call run-dev,$(OPTIONS),pytest $(ARGS))
