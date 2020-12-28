@@ -3,13 +3,14 @@ import dotenv as DE
 DE.load_dotenv()
 DE.load_dotenv(DE.find_dotenv('.env.defaults'))
 
-import typing as T
 import tensorflow as TF
+
+# Modules included with python
+import typing as T
 import numpy as NP
 import json as J
 import pickle as P
 import warnings as W
-
 import os
 
 # local module imports
@@ -23,21 +24,39 @@ print(f"EPOCHS set to: {EPOCHS}")
 print(f"START_STR_DESCRIPTION set to: {START_STR_DESCRIPTION}")
 
 def preprocessAndSaveData(data: str,
-                          lookup_creation_func: T.Any, # TODO, there's probably a better way to type this...
+                          lookup_creation_func: T.Callable[[str],T.Iterable[dict]], 
                           filepath: str):
-    """TODO Document"""
+    """Preprocesses the provided data string using the provided callable,
+    and writes the information to a local file at the path provided for later
+    use.
+
+    :param data: The string of data to be processed by lookup_creation_function
+    :param lookup_creation_func: A function that will provide a map of characters
+     to integers, and integers to characters (in that order) returned as a tuple.
+    :param filepath: The location where this preprocessed data should be pickled.
+    """
     vocab_to_int, int_to_vocab = lookup_creation_func(data)
     int_data = [vocab_to_int[word] for word in data]
     with open(filepath, "wb") as f:
         P.dump((int_data, vocab_to_int, int_to_vocab), f)
 
-def loadPickle(filepath: str):
-    """TODO Document"""
+def loadPickle(filepath: str) -> T.Iterable[T.Any]:
+    """A simple call to load a pickle file
+
+    :param filepath: The location of the pickle file to load.
+
+    :return: The contents of the pickle file as an object.
+    """
     with open(filepath, "rb") as f:
         return P.load(f)
 
 def createLookupTables(data: str) -> T.Iterable[dict]:
-    """TODO Document"""
+    """Processes the provided data string for machine learning.
+    
+    :param data: The string to be processed.
+
+    :return: A tuple containing a dictionary of characters from the data mapped 
+     to integers, and an inverse of that mapping - in that order."""
     vocab = sorted(set(data))
     print(f"{len(vocab)} unique characters found")
     vocab_to_int = {u:i for i, u in enumerate(vocab)}
@@ -48,7 +67,15 @@ def buildModel(vocab_size: int,
                embedding_dim: int,
                rnn_units: int,
                batch_size: int) -> TF.keras.Model:
-    """TODO Document"""
+    """Creates a sequential model using Tensorflow.
+
+    :vocab_size: Number of unique characters in the data set.
+    :embedding_dim: The dimension of the dense embedding.
+    :rnn_units: Dimensionality of the outer space of the GRU layer
+    :batch_size: Number of training samples per batch
+
+    :return: A Tenforflow Model object, based on the provided params.
+    """
     model = TF.keras.Sequential([
         TF.keras.layers.Embedding(vocab_size, embedding_dim,
                                   batch_input_shape=[batch_size, None]),
@@ -64,7 +91,16 @@ def generate_text(model: TF.keras.Model,
                   start_string: str,
                   char2idx: dict,
                   idx2char: dict) -> str:
-    """TODO Document"""
+    """Generate a string of text using the provided tensorflow model.
+
+    :param model: The tensorflow model object from which to generate text.
+    :param start_string: A string to seed the text generation.
+    :param char2idx: A dictionary of characters mapped to integers, representing all
+     of the possible characters the model can generate.
+    :param idx2char: A dictionary that serves as the inverse of char2idx
+
+    :return: The generated string, beginning with the seeded start_string
+    """
     # Evaluation step (generating text using the learned model)
     # Number of characters to generate
     num_generate = 1000
@@ -88,9 +124,11 @@ def generate_text(model: TF.keras.Model,
         # remove the batch dimension
         predictions = TF.squeeze(predictions, 0)
         
-        # using a categorical distribution to predict the character returned by the model
+        # using a categorical distribution to predict the character
+        #  returned by the model
         predictions = predictions / temperature
-        predicted_id = TF.random.categorical(predictions, num_samples=1)[-1,0].numpy()
+        predicted_id = TF.random.categorical(
+            predictions, num_samples=1)[-1,0].numpy()
         
         # Pass the predicted character as the next input to the model
         # along with the previous hidden state
