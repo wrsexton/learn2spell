@@ -11,4 +11,4 @@ To run the unit tests, use the `make check` command in the root of the repositor
 To run the application, use the `make run` command in the root of the repository.
 
 ## Setting the environment variables
-Set the environment variables in the .env.defaults file, or the default values will be used.
+Set the environment variables in the `.env` file, or the default values from [`.env.defaults`](.env.defaults) will be used.

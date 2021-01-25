@@ -17,8 +17,8 @@ import os
 import spells as S
 
 # ENV VARS
-EPOCHS = int(os.getenv("L2S_EPOCHS", "10"))
-START_STR_DESCRIPTION = os.getenv("L2S_START_STR_DESCRIPTION", "A ")
+EPOCHS = int(T.cast(str, os.getenv("L2S_EPOCHS")))
+START_STR_DESCRIPTION = T.cast(str, os.getenv("L2S_START_STR_DESCRIPTION"))
 
 print(f"EPOCHS set to: {EPOCHS}")
 print(f"START_STR_DESCRIPTION set to: {START_STR_DESCRIPTION}")
