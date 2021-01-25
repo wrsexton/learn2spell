@@ -8,7 +8,7 @@ CURRENT_USER = -u $(UID):$(GID)
 DOCKER = docker
 DOCKER_RUN = $(DOCKER) run --rm $(CURRENT_USER) $(DOCKER_RUN_FLAGS)
 
-run-dev = exec $(DOCKER_RUN) $1 $(DOCKER_DEV_IMAGE)
+run-dev = DOCKER_BUILDKIT=1 exec $(DOCKER_RUN) $1 $(DOCKER_DEV_IMAGE)
 
 all::
 
@@ -22,7 +22,7 @@ check: .setup
 	$(call run-dev,$(OPTIONS)) pytest $(ARGS)
 
 .setup: setup.cfg
-	exec $(DOCKER) build\
+	DOCKER_BUILDKIT=1 exec $(DOCKER) build\
 	 --build-arg GID=$(GID)\
 	 --build-arg PWD\
 	 -t $(DOCKER_DEV_IMAGE)\
